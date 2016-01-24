@@ -25,6 +25,7 @@
   <body>
     <div id="chronopaper"></div>
 
+    <div id="test-data"></div>
     <!-- Login Page -->
     <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
     <script>
@@ -41,6 +42,7 @@
         console.log("ID Token: " + id_token);
 
         CPAws.setGoogleLogin(id_token);
+        CPAws.checkTestData();
       };
     </script>
 
