@@ -78,8 +78,8 @@ gulp.task('scripts', function() {
   gulp
     .src(paths.scripts, {cwd: dirs.src})
     .pipe(babel())
-    .pipe(uglify())
     .pipe(concat('app.min.js'))
+    .pipe(uglify())
     .pipe($.size({title: 'scripts'}))
     .pipe(gulp.dest(dirs.dist + 'scripts/'));
 });
