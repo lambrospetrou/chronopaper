@@ -42,14 +42,14 @@ gulp.task('clean', function() {
 });
 
 /** SASS **/
+const autoprefixerOptions = {
+  browsers: []
+};
+const sassOptions = { 
+  outputStyle: 'compressed', 
+  errLogToConsole: true 
+};
 gulp.task('sass', () => {
-  const autoprefixerOptions = {
-    browsers: []
-  };
-  const sassOptions = { 
-    outputStyle: 'compressed', 
-    errLogToConsole: true 
-  };
   return gulp
     .src(paths.styles, {cwd: dirs.src})
     .pipe(sourcemaps.init())
@@ -63,13 +63,13 @@ gulp.task('sass', () => {
 });
 gulp.task('sass-prod', () => {
   return gulp
-    .src(sassPaths.src)
+    .src(paths.styles, {cwd: dirs.src})
     .pipe(sass(sassOptions).on('error', sass.logError))
     .pipe(autoprefixer(autoprefixerOptions))
     .pipe(concat('styles.min.css'))
     .pipe(cssnano())
     .pipe($.size({title: 'styles'}))
-    .pipe(gulp.dest(sassPaths.dist));
+    .pipe(gulp.dest(dirs.dist + 'styles/'));
 });
 
 /** SCRIPTS **/
