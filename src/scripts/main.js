@@ -2,11 +2,17 @@
 
   var containerElement = document.querySelector('#chronopaper');
 
+  function setState(_this, params) {
+    _this.setState(Object.assign({}, _this.state, params));
+    return _this;
+  }
+
   var PaperForm = React.createClass({
 
     getInitialState: function() {
       return {
-        text: ''
+        view: 'editor',
+        text: '',
       };
     },
 
@@ -14,8 +20,16 @@
       containerElement.querySelector('.paper-text').focus();
     },
 
+    handleViewChange: function(e) {
+      setState(this, {
+        view: e.target.checked === true ? 'markdown' : 'editor'
+      });
+    },
+
     handleTextChange: function(e) {
-      this.setState({ text: e.target.value });
+      setState(this, {
+        text: e.target.value
+      });
     },
 
     handleSubmit: function(e) {
@@ -31,19 +45,37 @@
         this.props.onPaperSubmit({text: text, id: text});
       }
       // Reset the paper form.
-      this.setState({text: ''});
+      setState(this, {
+        text: ''
+      });
 
       containerElement.querySelector('.paper-text').focus();
     },
 
+    rawMarkup: function() {
+      var rawMarkup = marked(this.state.text, {sanitize: true});
+      return { __html: rawMarkup };
+    },
+
     render: function() {
-      return (
-        <div className="paper-form-container">
-          <form className="paper-form" onSubmit={this.handleSubmit}>
+      var editorView = null;
+      if (this.state.view === 'editor') {
+        editorView = (
+          <div>
             <textarea className="paper-text" placeholder="Start typing..." 
               value={this.state.text} 
               onChange={this.handleTextChange}></textarea>
             <button type="submit">Post</button>
+          </div>
+        );
+      } else if (this.state.view === 'markdown') {
+        editorView = <div dangerouslySetInnerHTML={this.rawMarkup()} />;
+      }
+      return (
+        <div className="paper-form-container">
+          <form className="paper-form" onSubmit={this.handleSubmit}>
+            <label>View Markdown<input id="chk-markdown" type="checkbox" value="markdown" onChange={this.handleViewChange} /></label>
+            { editorView }
           </form>
         </div>
       );
@@ -51,16 +83,10 @@
   });
 
   var Paper = React.createClass({
-    rawMarkup: function() {
-      var rawMarkup = marked(this.props.paper.text, {sanitize: true});
-      return { __html: rawMarkup };
-    },
-
     render: function() {
       return (
         <div className="paper">
-          <h2 className="paper-title">Untitled paper</h2>
-          <div dangerouslySetInnerHTML={this.rawMarkup()} />
+          <h2 className="paper-title">Untitled paper - {this.props.paper.id}</h2>
         </div>
       );
     }
