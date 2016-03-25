@@ -52,7 +52,7 @@
 
   var Paper = React.createClass({
     rawMarkup: function() {
-      var rawMarkup = marked(this.props.children.toString(), {sanitize: true});
+      var rawMarkup = marked(this.props.paper.text, {sanitize: true});
       return { __html: rawMarkup };
     },
 
@@ -70,7 +70,7 @@
     render: function() {
       var paperNodes = this.props.data.map(function(paper) {
         return (
-          <Paper title={paper.title} key={paper.id}>{paper.text}</Paper>
+          <Paper paper={paper} key={paper.id} />
         );
       });
       return (
