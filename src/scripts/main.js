@@ -118,7 +118,7 @@
         return (
           <li><Paper paper={paper} key={idx} onClick={_this.handlePaperOnClick.bind(_this, _this.props, paper, idx)} /></li>
         );
-      });
+      }).reverse();
       return (
         <div className="paper-list-container">
           <ul className="paper-list">{paperNodes}</ul>
