@@ -55,8 +55,15 @@ h1 {
   padding-left: 20px;
 }
 
-.paper-text {
+.content-editable-text {
   min-height: 300px;
   min-width: 300px;
   width: 100%;
+}
+
+.pre {
+  tab-size: 2;
+  word-wrap: break-word; /* IE 5.5-7 white-space */
+  white-space: pre-wrap; 
+  overflow-wrap: break-word; /* force word break in long lines */
 }

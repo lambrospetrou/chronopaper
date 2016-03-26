@@ -17,6 +17,58 @@
     return _this;
   }
 
+  var ContentEditable = React.createClass({
+    getInitialState: function() {
+      return {
+        value: this.props.value
+      };
+    },
+
+    handleTextChange: function(e) {
+      console.log(Object.assign({}, e));
+      var text = '';
+      if (e.type === 'change') {
+        text = e.target.value;
+      } else if (e.type === 'keyup' || e.type === 'blur') {
+        // TODO need this???
+        text = e.target.innerText;
+      } else if (!!e.target) {
+        text = e.target.innerText;
+      }
+
+      // Notify for paper submit
+      if (this.props.onChange && text !== this.state.value) {
+        // TODO create a hash ID for the paper
+        this.props.onChange(text);
+      }
+      setState(this, { value: text });
+    },
+
+    rawMarkup: function() {
+      var value = '';
+      if (!!this.props.value) {
+        value = this.props.value;
+      }
+      console.log({ value: value });
+      return { __html: value };
+    },
+
+    render: function() {
+      return (
+        <pre contentEditable="true" className="content-editable-text" 
+          onInput={this.handleTextChange}
+          dangerouslySetInnerHTML={this.rawMarkup()}></pre>
+      );
+      /*
+      return (
+        <textarea className="content-editable-text" placeholder="Start typing..." 
+          value={this.props.value} 
+          onChange={this.handleTextChange}></textarea>
+      );
+      */
+    }
+  });
+
   var PaperForm = React.createClass({
 
     getInitialState: function() {
@@ -30,14 +82,18 @@
     },
 
     handleViewChange: function(e) {
+      var html = '';
+      if (e.target.checked === true) {
+        html = containerElement.querySelector('.paper-text').innerHTML;
+      }
       setState(this, {
-        view: e.target.checked === true ? 'markdown' : 'editor'
+        view: e.target.checked === true ? 'markdown' : 'editor',
+        innerHTML: html
       });
     },
 
-    handlePaperTextChange: function(e) {
-      var text = e.target.value;
-
+    handlePaperTextChange: function(text) {
+      console.log(Object.assign({}, text));
       // update the paper
       var paper = Object.assign({}, this.props.paper, {
         text: text,
@@ -68,9 +124,9 @@
       if (this.state.view === 'editor') {
         editorView = (
           <div>
-            <textarea className="paper-text" placeholder="Start typing..." 
-              value={this.props.paper.text} 
-              onChange={this.handlePaperTextChange}></textarea>
+            <div className="paper-text">
+              <ContentEditable onChange={this.handlePaperTextChange} value={this.props.paper.text}/>
+            </div>
             <button type="submit">Create New</button>
           </div>
         );
@@ -116,7 +172,7 @@
       var _this = this;
       var paperNodes = this.props.papers.map(function(paper, idx) {
         return (
-          <li><Paper paper={paper} key={idx} onClick={_this.handlePaperOnClick.bind(_this, _this.props, paper, idx)} /></li>
+          <li key={idx}><Paper paper={paper} onClick={_this.handlePaperOnClick.bind(_this, _this.props, paper, idx)} /></li>
         );
       }).reverse();
       return (
