@@ -116,11 +116,13 @@
       var _this = this;
       var paperNodes = this.props.papers.map(function(paper, idx) {
         return (
-          <Paper paper={paper} key={idx} onClick={_this.handlePaperOnClick.bind(_this, _this.props, paper, idx)} />
+          <li><Paper paper={paper} key={idx} onClick={_this.handlePaperOnClick.bind(_this, _this.props, paper, idx)} /></li>
         );
       });
       return (
-        <div className="paper-list">{paperNodes}</div>
+        <div className="paper-list-container">
+          <ul className="paper-list">{paperNodes}</ul>
+        </div>
       );
     }
   });
@@ -164,9 +166,11 @@
       console.log(Object.assign({}, this.state));
       return (
         <div className="paper-box">
-          <h1>Papers</h1>
-          <PaperList papers={this.state.papers} onSelectedPaper={this.handleOnSelectedPaper}/>
-          <PaperForm paper={this.state.papers[this.state.selectedPaperIdx]} 
+          <PaperList 
+            papers={this.state.papers} 
+            onSelectedPaper={this.handleOnSelectedPaper}/>
+          <PaperForm
+            paper={this.state.papers[this.state.selectedPaperIdx]} 
             onPaperSubmit={this.handleOnPaperSubmit}
             onCreateNewPaper={this.handleOnCreateNewPaper} />
         </div>
