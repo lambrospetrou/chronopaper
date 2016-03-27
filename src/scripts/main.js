@@ -19,53 +19,42 @@
 
   var ContentEditable = React.createClass({
     getInitialState: function() {
-      return {
-        value: this.props.value
-      };
+      return {};
+    },
+    shouldComponentUpdate: function(nextProps, nextState) {
+      //return this.props.value !== nextProps.value;
+      return true;
     },
 
     handleTextChange: function(e) {
-      console.log(Object.assign({}, e));
+      //console.log(Object.assign({}, e));
       var text = '';
-      if (e.type === 'change') {
-        text = e.target.value;
-      } else if (e.type === 'keyup' || e.type === 'blur') {
-        // TODO need this???
-        text = e.target.innerText;
-      } else if (!!e.target) {
-        text = e.target.innerText;
+      if (!!e.target) {
+        if (!!e.target.value) {
+          text = e.target.value;
+        } else if (!!e.target.innerText) {
+          text = e.target.innerText;
+        }
       }
 
-      // Notify for paper submit
-      if (this.props.onChange && text !== this.state.value) {
-        // TODO create a hash ID for the paper
-        this.props.onChange(text);
+      if (text !== this.lastValue) {
+        this.lastValue = text;
+        // Notify for paper submit
+        if (this.props.onChange) {
+          this.props.onChange(text);
+        }
       }
-      setState(this, { value: text });
-    },
-
-    rawMarkup: function() {
-      var value = '';
-      if (!!this.props.value) {
-        value = this.props.value;
-      }
-      console.log({ value: value });
-      return { __html: value };
     },
 
     render: function() {
       return (
-        <pre contentEditable="true" className="content-editable-text" 
-          onInput={this.handleTextChange}
-          dangerouslySetInnerHTML={this.rawMarkup()}></pre>
+        <div className="expanding-area active">
+          <pre><span>{this.props.value}</span><br/></pre>
+          <textarea
+            value={this.props.value}
+            onChange={this.handleTextChange}></textarea>
+        </div>
       );
-      /*
-      return (
-        <textarea className="content-editable-text" placeholder="Start typing..." 
-          value={this.props.value} 
-          onChange={this.handleTextChange}></textarea>
-      );
-      */
     }
   });
 
@@ -78,22 +67,17 @@
     },
 
     componentDidMount: function() {
-      containerElement.querySelector('.paper-text').focus();
+      containerElement.querySelector('.expanding-area textarea').focus();
     },
 
     handleViewChange: function(e) {
-      var html = '';
-      if (e.target.checked === true) {
-        html = containerElement.querySelector('.paper-text').innerHTML;
-      }
       setState(this, {
-        view: e.target.checked === true ? 'markdown' : 'editor',
-        innerHTML: html
+        view: e.target.checked === true ? 'markdown' : 'editor'
       });
     },
 
     handlePaperTextChange: function(text) {
-      console.log(Object.assign({}, text));
+      //console.log(Object.assign({}, text));
       // update the paper
       var paper = Object.assign({}, this.props.paper, {
         text: text,
@@ -131,7 +115,7 @@
           </div>
         );
       } else if (this.state.view === 'markdown') {
-        editorView = <div dangerouslySetInnerHTML={this.rawMarkup()} />;
+        editorView = <div className="paper-text" dangerouslySetInnerHTML={this.rawMarkup()} />;
       }
       return (
         <div className="paper-form-container">
@@ -149,6 +133,10 @@
       if (this.props.onClick) {
         this.props.onClick(e);
       }
+    },
+
+    shouldComponentUpdate: function(nextProps, nextState) {
+      return this.props.paper.dateUpdated.toISOString() !== nextProps.paper.dateUpdated.toISOString();
     },
 
     render: function() {
@@ -208,7 +196,6 @@
       papers[this.state.selectedPaperIdx] = Object.assign({}, paper);
       setState(this, {papers: papers});
         // TODO send to the server and update the data[]
-      console.log(paper);
     },
 
     handleOnCreateNewPaper: function() {
@@ -219,7 +206,7 @@
     },
 
     render: function() {
-      console.log(Object.assign({}, this.state));
+      //console.log(Object.assign({}, this.state));
       return (
         <div className="paper-box">
           <PaperList 
