@@ -3,21 +3,22 @@
   // https://john-dugan.com/javascript-debounce/
   function debounce(func, wait, immediate) {
     var timeout;
+    if (immediate === true) {
+      return function() {
+        func.apply(this, arguments);
+      };
+    }
     return function() {
+      console.log('i');
       var context = this,
-      args = arguments;
+          args = arguments;
+
       var later = function() {
         timeout = null;
-        if (!immediate) {
-          func.apply(context, args);
-        }
+        func.apply(context, args);
       };
-      var callNow = immediate && !timeout;
       clearTimeout(timeout);
       timeout = setTimeout(later, wait || 200);
-      if (callNow) { 
-        func.apply(context, args);
-      }
     };
   }
 
@@ -38,19 +39,22 @@
     return _this;
   }
 
+  // This component uses its own state to keep the view updated and the props
+  // are only used for the initial load.
   var ContentEditable = React.createClass({
     getInitialState: function() {
       return {
         value: this.props.value
       };
     },
-
-    shouldComponentUpdate: function(nextProps, nextState) {
-      //return this.props.value !== nextProps.value;
-      return true;
+    componentWillReceiveProps: function(nextProps) {
+      //console.log('componentWillReceiveProps', Object.assign({}, nextProps));
+      setState(this, {
+        value: nextProps.value
+      });
     },
 
-    componentDidMount: function() {
+     componentDidMount: function() {
       // create the debounced onChange method
       this.onChangeDebounced = debounce(function() {
         console.log('actual onChange');
@@ -61,23 +65,19 @@
       }.bind(this));
     },
 
-    componentWillReceiveProps: function(nextProps) {
-      //console.log('componentWillReceiveProps', Object.assign({}, nextProps));
-      setState(this, {
-        value: nextProps.value
-      });
-    },
-
     handleTextChange: function(e) {
       //console.log(Object.assign({}, e));
       var text = e.target.value;
 
       this.setState({ value: text });
       this.onChangeDebounced();
+      /*if (this.props.onChange) {
+        this.props.onChange(text);
+      }*/
     },
 
     render: function() {
-      console.log('render');
+      //console.log('render');
       return (
         <div className="expanding-area active">
           <pre><span>{this.state.value}</span><br/></pre>
