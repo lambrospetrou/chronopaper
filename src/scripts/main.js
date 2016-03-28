@@ -41,6 +41,58 @@
 
   // This component uses its own state to keep the view updated and the props
   // are only used for the initial load.
+  // Props: value[String], onChange[function(String)], debounceEnabled[Boolean]
+  var ExpandableTextarea = React.createClass({
+    getInitialState: function() {
+      return {
+        value: this.props.value
+      };
+    },
+    componentWillReceiveProps: function(nextProps) {
+      setState(this, {
+        value: nextProps.value
+      });
+    },
+
+    componentDidMount: function() {
+      // create the debounced onChange method if required
+      if (this.props.debounceEnabled === 'true') {
+        this.onChangeWrapper = debounce(function(value) {
+          console.log('actual onChange');
+          if (this.props.onChange) {
+            this.props.onChange(value);
+          }
+        }.bind(this));
+      } else {
+        this.onChangeWrapper = function(value) {
+          if (this.props.onChange) {
+            this.props.onChange(value);
+          }
+        };
+      }
+      
+    },
+
+    handleTextChange: function(e) {
+      var text = e.target.value;
+      this.setState({ value: text });
+      this.onChangeWrapper(text);
+    },
+
+    render: function() {
+      return (
+        <div className="expanding-area">
+          <pre><span>{this.state.value}</span><br/></pre>
+          <textarea
+            value={this.state.value}
+            onChange={this.handleTextChange}></textarea>
+        </div>
+      );
+    }
+  });
+/*
+  // This component uses its own state to keep the view updated and the props
+  // are only used for the initial load.
   var ContentEditable = React.createClass({
     getInitialState: function() {
       return {
@@ -63,32 +115,36 @@
           this.props.onChange(this.state.value);
         }
       }.bind(this));
+      this.findDOMNode
     },
 
     handleTextChange: function(e) {
       //console.log(Object.assign({}, e));
-      var text = e.target.value;
+      //var text = e.target.value;
+      var text = e.target.textContent;
 
       this.setState({ value: text });
       this.onChangeDebounced();
-      /*if (this.props.onChange) {
-        this.props.onChange(text);
-      }*/
     },
 
     render: function() {
       //console.log('render');
+      var editorContent = (
+        <div contentEditable="true" spellCheck="true" className="editor-content" 
+              onInput={this.handleTextChange}
+              dangerouslySetInnerHTML={{__html: this.state.value}}
+              ref={function(input) {
+                    if (input != null) {
+                      input.focus();
+                    }
+                  }}></div>
+      );
       return (
-        <div className="expanding-area active">
-          <pre><span>{this.state.value}</span><br/></pre>
-          <textarea
-            value={this.state.value}
-            onChange={this.handleTextChange}></textarea>
-        </div>
+        <div className="expanding-area">{editorContent}</div>
       );
     }
   });
-
+*/
   var PaperForm = React.createClass({
 
     getInitialState: function() {
@@ -98,7 +154,6 @@
     },
 
     componentDidMount: function() {
-      containerElement.querySelector('.expanding-area textarea').focus();
     },
 
     handleViewChange: function(e) {
@@ -140,7 +195,9 @@
         editorView = (
           <div>
             <div className="paper-text">
-              <ContentEditable onChange={this.handlePaperTextChange} value={this.props.paper.text}/>
+              <ExpandableTextarea value={this.props.paper.text}
+                onChange={this.handlePaperTextChange}
+                debounceEnabled="true"/>
             </div>
             <button type="submit">Create New</button>
           </div>
