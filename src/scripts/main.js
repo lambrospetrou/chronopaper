@@ -1,6 +1,10 @@
 // Add the object returned to the global window object.
 window.CPAws = require('./aws.js');
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {Editor, EditorState} from 'draft-js';
+
 (function() {
 
   // https://john-dugan.com/javascript-debounce/
@@ -174,6 +178,21 @@ window.CPAws = require('./aws.js');
     }
   });
 
+  var DraftEditor = React.createClass({
+    getInitialState: function() {
+      return { editorState: EditorState.createEmpty() };
+    },
+
+    onChange: function(editorState) {
+      console.log('react', Object.assign({}, editorState));
+      this.setState({editorState: editorState});
+    },
+
+    render: function() {
+      return <Editor editorState={this.state.editorState} onChange={this.onChange} />;
+    }
+  });
+
   var PaperForm = React.createClass({
 
     getInitialState: function() {
@@ -224,7 +243,7 @@ window.CPAws = require('./aws.js');
         editorView = (
           <div>
             <div className="paper-text">
-              <ExpandableTextarea value={this.props.paper.text}
+              <DraftEditor value={this.props.paper.text}
                 onChange={this.handlePaperTextChange}
                 debounceEnabled="true"/>
             </div>
