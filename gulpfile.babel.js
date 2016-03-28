@@ -14,6 +14,7 @@ import babel from 'gulp-babel';
 import clean from 'gulp-clean';
 import concat from 'gulp-concat';
 import uglify from 'gulp-uglify';
+import webpack from 'gulp-webpack';
 
 const dirs = {
   src: 'src/',
@@ -79,10 +80,21 @@ gulp.task('scripts', () => {
   gulp
     .src(paths.scripts, { cwd: dirs.src })
     .pipe(babel())
-    .pipe(concat('app.min.js'))
+    .pipe(concat('bundle.js'))
     .pipe(uglify())
     .pipe($.size({ title: 'scripts' }))
     .pipe(gulp.dest(`${dirs.dist}scripts/`));
+});
+
+gulp.task('webpack', () => {
+  gulp
+    .src('build/scripts/bundle.js')
+    .pipe(clean());
+  
+  gulp
+    .src('src/scripts/main.js')
+    .pipe(webpack(Object.assign(require('./webpack.config.js'), { output: { filename: 'bundle.js'}})))
+    .pipe(gulp.dest('build/scripts/'));
 });
 
 // Copy all other files to dist directly
@@ -108,7 +120,8 @@ gulp.task('watch', () => {
     .on('change', eventHandler);
 
   gulp
-    .watch(createPath(dirs.src, paths.scripts), ['scripts'])
+    //.watch(createPath(dirs.src, paths.scripts), ['scripts'])
+    .watch(createPath(dirs.src, paths.scripts), ['webpack'])
     .on('change', eventHandler);
 
   gulp
@@ -123,7 +136,8 @@ gulp.task('watch', () => {
 /** Task to change scripts used in the HTML. **/
 // http://tylermcginnis.com/reactjs-tutorial-pt-2-building-react-applications-with-gulp-and-browserify/
 
-gulp.task('dev', ['sass', 'scripts', 'copy']);
-gulp.task('release', ['sass:prod', 'scripts', 'copy']);
+//gulp.task('dev', ['sass', 'scripts', 'copy']);
+gulp.task('dev', ['sass', 'webpack', 'copy']);
+gulp.task('release', ['sass:prod', 'webpack', 'copy']);
 
 gulp.task('default', ['dev']);

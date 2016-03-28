@@ -1,3 +1,6 @@
+// Add the object returned to the global window object.
+window.CPAws = require('./aws.js');
+
 (function() {
 
   // https://john-dugan.com/javascript-debounce/
@@ -90,9 +93,28 @@
       );
     }
   });
-/*
+
+  function getCaretCharOffset(element) {
+    var caretOffset = 0;
+    if (typeof window.getSelection != "undefined") {
+        var range = window.getSelection().getRangeAt(0);
+        var preCaretRange = range.cloneRange();
+        preCaretRange.selectNodeContents(element);
+        preCaretRange.setEnd(range.endContainer, range.endOffset);
+        caretOffset = preCaretRange.toString().length;
+    } else if (typeof document.selection != "undefined" && document.selection.type != "Control") {
+        var textRange = document.selection.createRange();
+        var preCaretTextRange = document.body.createTextRange();
+        preCaretTextRange.moveToElementText(element);
+        preCaretTextRange.setEndPoint("EndToEnd", textRange);
+        caretOffset = preCaretTextRange.text.length;
+    }
+    console.log('caret', caretOffset);
+    return caretOffset;
+  }
   // This component uses its own state to keep the view updated and the props
   // are only used for the initial load.
+  // Props: value[String], onChange[function(String)], debounceEnabled[Boolean]
   var ContentEditable = React.createClass({
     getInitialState: function() {
       return {
@@ -100,51 +122,58 @@
       };
     },
     componentWillReceiveProps: function(nextProps) {
-      //console.log('componentWillReceiveProps', Object.assign({}, nextProps));
       setState(this, {
         value: nextProps.value
       });
     },
 
-     componentDidMount: function() {
-      // create the debounced onChange method
-      this.onChangeDebounced = debounce(function() {
-        console.log('actual onChange');
-        // Notify for paper submit
-        if (this.props.onChange) {
-          this.props.onChange(this.state.value);
-        }
-      }.bind(this));
-      this.findDOMNode
+    componentDidMount: function() {
+      // create the debounced onChange method if required
+      if (this.props.debounceEnabled === 'true') {
+        this.onChangeWrapper = debounce(function(value) {
+          console.log('actual onChange');
+          if (this.props.onChange) {
+            this.props.onChange(value);
+          }
+        }.bind(this));
+      } else {
+        this.onChangeWrapper = function(value) {
+          if (this.props.onChange) {
+            this.props.onChange(value);
+          }
+        };
+      }
+      
     },
 
-    handleTextChange: function(e) {
-      //console.log(Object.assign({}, e));
-      //var text = e.target.value;
-      var text = e.target.textContent;
+    _handleTextChange: function(e) {
+      console.log(Object.assign({}, e));
+      var text = e.target.innerHTML;
 
-      this.setState({ value: text });
-      this.onChangeDebounced();
+      this.setState({ value: e.target.textContent, innerHTML: e.target.innerHTML, innerText: e.target.innerText });
+      this.onChangeWrapper(text);
+    },
+
+    _handleKeyUp: function(e) {
+      if (e.key === 'Enter' || e.keyCode === 13) {
+        console.log(Object.assign({}, e));
+        // put <br/> inside the div
+        console.log('enter', window.getSelection(), getCaretCharOffset(e.target));
+      }
     },
 
     render: function() {
-      //console.log('render');
-      var editorContent = (
-        <div contentEditable="true" spellCheck="true" className="editor-content" 
-              onInput={this.handleTextChange}
-              dangerouslySetInnerHTML={{__html: this.state.value}}
-              ref={function(input) {
-                    if (input != null) {
-                      input.focus();
-                    }
-                  }}></div>
-      );
+      console.log(this.state);
       return (
-        <div className="expanding-area">{editorContent}</div>
+        <div className="expanding-area">
+          <div contentEditable="true" spellCheck="true" className="editor-content" 
+            onInput={this._handleTextChange} onKeyUp={this._handleKeyUp}
+            dangerouslySetInnerHTML={{__html: this.state.innerHTML}}></div>
+        </div>
       );
     }
   });
-*/
+
   var PaperForm = React.createClass({
 
     getInitialState: function() {

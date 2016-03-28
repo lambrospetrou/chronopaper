@@ -16,10 +16,10 @@
     "paper",
     "chronopaper"
   ],
-  "dependencies": {},
   "devDependencies": {
     "babel-core": "^6.7.2",
     "babel-eslint": "^5.0.0",
+    "babel-loader": "^6.2.4",
     "babel-preset-es2015": "^6.6.0",
     "babel-preset-react": "^6.3.13",
     "babel-register": "^6.7.2",
@@ -36,7 +36,9 @@
     "gulp-sass": "^2.1.1",
     "gulp-size": "^2.0.0",
     "gulp-sourcemaps": "^1.6.0",
-    "gulp-uglify": "^1.5.1"
+    "gulp-uglify": "^1.5.1",
+    "gulp-webpack": "^1.5.0",
+    "webpack": "^1.12.14"
   },
   "analyze": true,
   "license": "Apache-2.0"

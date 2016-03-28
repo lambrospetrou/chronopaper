@@ -1,4 +1,4 @@
-var CPAws = (function() {
+module.exports = (function() {
 
   function buildCognitoCredentialsParams(loginParams) {
     var logins = {};

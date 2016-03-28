@@ -116,6 +116,12 @@ h1 {
     visibility: hidden;
   }
 
+  /** ContentEditable. */
+
+  .content-editable-textarea {
+    display: none;
+  }
+  
   .editor-content {
     min-height: 200px;
 
