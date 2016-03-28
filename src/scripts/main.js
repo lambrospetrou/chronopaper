@@ -1,5 +1,26 @@
 (function() {
 
+  // https://john-dugan.com/javascript-debounce/
+  function debounce(func, wait, immediate) {
+    var timeout;
+    return function() {
+      var context = this,
+      args = arguments;
+      var later = function() {
+        timeout = null;
+        if (!immediate) {
+          func.apply(context, args);
+        }
+      };
+      var callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait || 200);
+      if (callNow) { 
+        func.apply(context, args);
+      }
+    };
+  }
+
   function buildPaperModel() {
     var now = moment();
     return {
@@ -19,39 +40,49 @@
 
   var ContentEditable = React.createClass({
     getInitialState: function() {
-      return {};
+      return {
+        value: this.props.value
+      };
     },
+
     shouldComponentUpdate: function(nextProps, nextState) {
       //return this.props.value !== nextProps.value;
       return true;
     },
 
-    handleTextChange: function(e) {
-      //console.log(Object.assign({}, e));
-      var text = '';
-      if (!!e.target) {
-        if (!!e.target.value) {
-          text = e.target.value;
-        } else if (!!e.target.innerText) {
-          text = e.target.innerText;
-        }
-      }
-
-      if (text !== this.lastValue) {
-        this.lastValue = text;
+    componentDidMount: function() {
+      // create the debounced onChange method
+      this.onChangeDebounced = debounce(function() {
+        console.log('actual onChange');
         // Notify for paper submit
         if (this.props.onChange) {
-          this.props.onChange(text);
+          this.props.onChange(this.state.value);
         }
-      }
+      }.bind(this));
+    },
+
+    componentWillReceiveProps: function(nextProps) {
+      //console.log('componentWillReceiveProps', Object.assign({}, nextProps));
+      setState(this, {
+        value: nextProps.value
+      });
+    },
+
+    handleTextChange: function(e) {
+      //console.log(Object.assign({}, e));
+      var text = e.target.value;
+
+      this.setState({ value: text });
+      this.onChangeDebounced();
     },
 
     render: function() {
+      console.log('render');
       return (
         <div className="expanding-area active">
-          <pre><span>{this.props.value}</span><br/></pre>
+          <pre><span>{this.state.value}</span><br/></pre>
           <textarea
-            value={this.props.value}
+            value={this.state.value}
             onChange={this.handleTextChange}></textarea>
         </div>
       );
