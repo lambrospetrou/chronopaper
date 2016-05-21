@@ -1,6 +1,6 @@
 // Add the object returned to the global window object.
 window.CPAws = require('./aws.js');
-
+/*
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Editor, EditorState} from 'draft-js';
@@ -362,3 +362,5 @@ import {Editor, EditorState} from 'draft-js';
     containerElement
   );
 }).call(this);
+
+*/
