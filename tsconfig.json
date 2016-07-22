@@ -2,14 +2,13 @@
     "compilerOptions": {
         "outDir": "./build/",
         "sourceMap": true,
-        "noImplicitAny": true,
+        "noImplicitAny": false,
         "module": "commonjs",
         "target": "es5",
         "jsx": "react"
     },
     "files": [
         "./typings/index.d.ts",
-        "./src/scripts/components/Hello.tsx",
         "./src/scripts/index.tsx"
     ]
 }

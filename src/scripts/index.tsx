@@ -1,9 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import  { Hello } from "./components/Hello";
+import  { RootApp } from "./components/RootApp.tsx";
 
 ReactDOM.render(
-    <Hello compiler="Typescript" framework="React" />,
-    document.querySelector('#chronopaper')
+    <RootApp />
+    , document.querySelector('#chronopaper')
 );

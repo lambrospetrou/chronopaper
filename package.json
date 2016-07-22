@@ -4,8 +4,8 @@
   "description": "Chronopaper for stupid simple note taking.",
   "author": "Lambros Petrou",
   "scripts": {
-    "build": "node ./node_modules/.bin/gulp",
-    "webpack": "node ./node_modules/.bin/webpack"
+    "build": "gulp",
+    "webpack": "webpack"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
     "eslint": "^2.4.0",
     "eslint-config-airbnb": "^6.2.0",
     "eslint-plugin-react": "^4.2.3",
+    "event-stream": "^3.3.4",
     "gulp": "^3.9.0",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-clean": "^0.3.1",
